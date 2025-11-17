@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Full-Arch Financing - Staff Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 20px 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .section-title {
+      margin-top: 25px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+      font-weight: bold;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button.primary {
+      background: #007bff;
+      color: #fff;
+    }
+    button.secondary {
+      background: #28a745;
+      color: #fff;
+    }
+    .results, .subscription-results, .error {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .results {
+      background: #e9f7ff;
+      border: 1px solid #b6defb;
+    }
+    .subscription-results {
+      background: #e6ffed;
+      border: 1px solid #b0f0c5;
+    }
+    .error {
+      background: #ffe6e6;
+      border: 1px solid #f5b5b5;
+      color: #a80000;
+    }
+    .small {
+      font-size: 12px;
+      color: #555;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+    .row > div {
+      flex: 1;
+    }
+    .link-box {
+      word-break: break-all;
+      background: #f9f9f9;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Full-Arch Financing - Staff Portal</h1>
+
+    <div class="section-title">Step 1 – Create Plan & Down Payment Link</div>
+    <form id="plan-form">
+      <label>Patient Name</label>
+      <input type="text" id="name" required />
+
+      <label>Patient Email</label>
+      <input type="email" id="email" required />
+
+      <div class="row">
+        <div>
+          <label>Total Fee ($)</label>
+          <input type="number" id="totalFee" required min="0" step="0.01" />
+        </div>
+        <div>
+          <label>Term (months)</label>
+          <input type="number" id="termMonths" required min="1" />
+        </div>
+      </div>
+
+      <label>Down Payment (%)</label>
+      <input type="number" id="downPercent" required min="0" max="100" step="1" />
+
+      <button type="submit" class="primary">Create Plan</button>
+      <div id="plan-error" class="error" style="display:none;"></div>
+      <div id="plan-results" class="results" style="display:none;"></div>
+    </form>
+
+    <div class="section-title">Step 2 – Start Monthly Autopay</div>
+    <p class="small">
+      Use this after the down payment is paid. It uses the same customer and remaining balance from Step 1.
+    </p>
+    <button id="create-subscription-btn" class="secondary" disabled>
+      Create Monthly Autopay Subscription
+    </button>
+    <div id="sub-error" class="error" style="display:none;"></div>
+    <div id="sub-results" class="subscription-results" style="display:none;"></div>
+  </div>
+
+  <script>
+    // CHANGE THIS IF YOU EVER CHANGE THE BACKEND URL:
+    const API_BASE = "https://full-arch-financing.onrender.com";
+
+    let lastPlanData = null; // store customerId, remaining, termMonths for Step 2
+
+    const planForm = document.getElementById("plan-form");
+    const planError = document.getElementById("plan-error");
+    const planResults = document.getElementById("plan-results");
+    const subError = document.getElementById("sub-error");
+    const subResults = document.getElementById("sub-results");
+    const createSubBtn = document.getElementById("create-subscription-btn");
+
+    planForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      planError.style.display = "none";
+      planResults.style.display = "none";
+      subError.style.display = "none";
+      subResults.style.display = "none";
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const totalFee = parseFloat(document.getElementById("totalFee").value);
+      const termMonths = parseInt(document.getElementById("termMonths").value, 10);
+      const downPercentRaw = parseFloat(document.getElementById("downPercent").value);
+
+      if (!name || !email || isNaN(totalFee) || isNaN(termMonths) || isNaN(downPercentRaw)) {
+        planError.textContent = "Please fill in all fields with valid values.";
+        planError.style.display = "block";
+        return;
+      }
+
+      const downPercent = downPercentRaw / 100; // convert percent to decimal
+
+      try {
+        const response = await fetch(API_BASE + "/api/create-plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            totalFee,
+            termMonths,
+            downPercent,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to create plan");
+        }
+
+        lastPlanData = {
+          customerId: data.customerId,
+          remaining: data.remaining,
+          termMonths: termMonths,
+        };
+
+        createSubBtn.disabled = false;
+
+        planResults.innerHTML = `
+          <div><strong>Plan created successfully!</strong></div>
+          <div>Down Payment: <strong>$${data.downPaymentAmount.toFixed(2)}</strong></div>
+          <div>Remaining Balance: <strong>$${data.remaining.toFixed(2)}</strong></div>
+          <div>Estimated Monthly Payment: <strong>$${data.monthly.toFixed(2)}</strong></div>
+          <div style="margin-top:8px;">
+            <div><strong>Down Payment Link (send to patient):</strong></div>
+            <div class="link-box">${data.paymentLinkUrl}</div>
+          </div>
+        `;
+        planResults.style.display = "block";
+      } catch (err) {
+        planError.textContent = err.message;
+        planError.style.display = "block";
+      }
+    });
+
+    createSubBtn.addEventListener("click", async () => {
+      subError.style.display = "none";
+      subResults.style.display = "none";
+
+      if (!lastPlanData) {
+        subError.textContent = "Please create a plan first.";
+        subError.style.display = "block";
+        return;
+      }
+
+      try {
+        const response = await fetch(API_BASE + "/api/create-invoice-schedule", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: lastPlanData.customerId,
+            remaining: lastPlanData.remaining,
+            termMonths: lastPlanData.termMonths,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to create subscription");
+        }
+
+        subResults.innerHTML = `
+          <div><strong>Monthly autopay subscription created!</strong></div>
+          <div>Subscription ID: <strong>${data.subscriptionId}</strong></div>
+          <div>Monthly Amount: <strong>$${data.amountMonthly.toFixed(2)}</strong></div>
+          <div>Term: <strong>${data.termMonths} months</strong></div>
+          <div>Remaining at time of setup: <strong>$${data.remaining.toFixed(2)}</strong></div>
+        `;
+        subResults.style.display = "block";
+      } catch (err) {
+        subError.textContent = err.message;
+        subError.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
