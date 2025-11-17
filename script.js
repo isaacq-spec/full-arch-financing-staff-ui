@@ -1,37 +1,51 @@
-const API_BASE = "http://localhost:3000/api";
+// Use your live backend URL on Render
+const API_BASE = "https://full-arch-financing.onrender.com/api";
 
 async function createPlan() {
+    const downPercentInput = Number(document.getElementById("downPercent").value);
+
     const data = {
         name: document.getElementById("name").value,
         email: document.getElementById("email").value,
         totalFee: Number(document.getElementById("totalFee").value),
         termMonths: Number(document.getElementById("termMonths").value),
-        downPercent: Number(document.getElementById("downPercent").value)
+        // backend expects a decimal (0.2 for 20%), so convert here
+        downPercent: downPercentInput / 100
     };
 
-    const res = await fetch(`${API_BASE}/create-plan`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
+    try {
+        const res = await fetch(`${API_BASE}/create-plan`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
 
-    const result = await res.json();
-    console.log(result);
+        const result = await res.json();
+        if (!res.ok) {
+            throw new Error(result.error || "Failed to create plan");
+        }
 
-    // Display results
-    document.getElementById("dp").innerText = result.downPaymentAmount;
-    document.getElementById("remaining").innerText = result.remaining;
-    document.getElementById("monthly").innerText = result.monthly;
+        console.log(result);
 
-    document.getElementById("paymentLink").href = result.paymentLinkUrl;
+        // Display results
+        document.getElementById("dp").innerText = result.downPaymentAmount.toFixed(2);
+        document.getElementById("remaining").innerText = result.remaining.toFixed(2);
+        document.getElementById("monthly").innerText = result.monthly.toFixed(2);
 
-    document.getElementById("results").classList.remove("hidden");
-    document.getElementById("autopayCard").classList.remove("hidden");
+        document.getElementById("paymentLink").href = result.paymentLinkUrl;
+        document.getElementById("paymentLink").innerText = result.paymentLinkUrl;
 
-    // Fill autopay fields automatically
-    document.getElementById("customerId").value = result.customerId;
-    document.getElementById("remainingInput").value = result.remaining;
-    document.getElementById("termInput").value = data.termMonths;
+        document.getElementById("results").classList.remove("hidden");
+        document.getElementById("autopayCard").classList.remove("hidden");
+
+        // Fill autopay fields automatically
+        document.getElementById("customerId").value = result.customerId;
+        document.getElementById("remainingInput").value = result.remaining;
+        document.getElementById("termInput").value = data.termMonths;
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
 }
 
 async function createAutopay() {
@@ -41,15 +55,26 @@ async function createAutopay() {
         termMonths: Number(document.getElementById("termInput").value)
     };
 
-    const res = await fetch(`${API_BASE}/create-invoice-schedule`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
+    try {
+        const res = await fetch(`${API_BASE}/create-invoice-schedule`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
 
-    const result = await res.json();
-    console.log(result);
+        const result = await res.json();
+        if (!res.ok) {
+            throw new Error(result.error || "Failed to create subscription");
+        }
 
-    document.getElementById("autopayResult").innerText =
-        "Subscription Created: " + result.subscriptionId;
+        console.log(result);
+
+        document.getElementById("autopayResult").innerText =
+            "Subscription Created: " + result.subscriptionId;
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
 }
+
+
