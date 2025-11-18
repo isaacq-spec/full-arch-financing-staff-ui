@@ -1,5 +1,5 @@
-// Correct backend URL (NO /api at the end)
-const API_BASE = "https://full-arch-financing.onrender.com";
+// Correct backend URL (WITH /api)
+const API_BASE = "https://full-arch-financing.onrender.com/api";
 
 // ----------------------------
 // CREATE PLAN + DOWN PAYMENT
@@ -12,7 +12,7 @@ async function createPlan() {
     email: document.getElementById("email").value,
     totalFee: Number(document.getElementById("totalFee").value),
     termMonths: Number(document.getElementById("termMonths").value),
-    downPercent: downPercentInput / 100, // convert from 20 → 0.20
+    downPercent: downPercentInput / 100,
   };
 
   try {
@@ -25,11 +25,9 @@ async function createPlan() {
     const result = await res.json();
 
     if (!res.ok) {
-      console.error("Server returned error:", result);
       throw new Error(result.error || "Failed to create plan");
     }
 
-    // Fill calculated values
     document.getElementById("dp").innerText =
       result.downPaymentAmount.toFixed(2);
     document.getElementById("remaining").innerText =
@@ -37,15 +35,12 @@ async function createPlan() {
     document.getElementById("monthly").innerText =
       result.monthly.toFixed(2);
 
-    // Put payment link
     document.getElementById("paymentLink").href = result.paymentLinkUrl;
     document.getElementById("paymentLink").innerText = result.paymentLinkUrl;
 
-    // Reveal UI sections
     document.getElementById("results").classList.remove("hidden");
     document.getElementById("autopayCard").classList.remove("hidden");
 
-    // Pre-fill autopay inputs
     document.getElementById("customerId").value = result.customerId;
     document.getElementById("remainingInput").value = result.remaining;
     document.getElementById("termInput").value = data.termMonths;
@@ -75,7 +70,6 @@ async function createAutopay() {
     const result = await res.json();
 
     if (!res.ok) {
-      console.error("Server returned error:", result);
       throw new Error(result.error || "Failed to create subscription");
     }
 
@@ -87,9 +81,7 @@ async function createAutopay() {
   }
 }
 
-// ----------------------------
-// WIRE UP THE FORMS
-// ----------------------------
+// Wire up forms
 document.addEventListener("DOMContentLoaded", () => {
   const planForm = document.getElementById("planForm");
   const autopayForm = document.getElementById("autopayForm");
@@ -108,3 +100,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
