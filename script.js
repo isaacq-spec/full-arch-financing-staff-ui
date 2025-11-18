@@ -1,10 +1,30 @@
-// Correct backend URL (WITH /api)
+// Backend API
 const API_BASE = "https://full-arch-financing.onrender.com/api";
+
+// ----------------------------
+// UTILITIES: Toast + Loading
+// ----------------------------
+function toast(msg, type = "success") {
+  const el = document.getElementById("toast");
+  el.innerText = msg;
+  el.style.background = type === "error" ? "#c0392b" : "#27ae60";
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 3000);
+}
+
+function showLoading() {
+  document.getElementById("loading").classList.remove("hidden");
+}
+function hideLoading() {
+  document.getElementById("loading").classList.add("hidden");
+}
 
 // ----------------------------
 // CREATE PLAN + DOWN PAYMENT
 // ----------------------------
 async function createPlan() {
+  showLoading();
+
   const downPercentInput = Number(document.getElementById("downPercent").value);
 
   const data = {
@@ -23,17 +43,16 @@ async function createPlan() {
     });
 
     const result = await res.json();
+    hideLoading();
 
     if (!res.ok) {
-      throw new Error(result.error || "Failed to create plan");
+      toast(result.error || "Failed to create plan", "error");
+      return;
     }
 
-    document.getElementById("dp").innerText =
-      result.downPaymentAmount.toFixed(2);
-    document.getElementById("remaining").innerText =
-      result.remaining.toFixed(2);
-    document.getElementById("monthly").innerText =
-      result.monthly.toFixed(2);
+    document.getElementById("dp").innerText = result.downPaymentAmount.toFixed(2);
+    document.getElementById("remaining").innerText = result.remaining.toFixed(2);
+    document.getElementById("monthly").innerText = result.monthly.toFixed(2);
 
     document.getElementById("paymentLink").href = result.paymentLinkUrl;
     document.getElementById("paymentLink").innerText = result.paymentLinkUrl;
@@ -41,12 +60,27 @@ async function createPlan() {
     document.getElementById("results").classList.remove("hidden");
     document.getElementById("autopayCard").classList.remove("hidden");
 
+    // Plan summary card
+    document.getElementById("summaryContent").innerHTML = `
+      <p><b>Patient:</b> ${data.name} (${data.email})</p>
+      <p><b>Total Fee:</b> $${data.totalFee}</p>
+      <p><b>Down Payment:</b> $${result.downPaymentAmount}</p>
+      <p><b>Remaining:</b> $${result.remaining}</p>
+      <p><b>Monthly:</b> $${result.monthly}</p>
+      <p><b>Customer ID:</b> ${result.customerId}</p>
+      <p><b>Payment Link:</b> <a href="${result.paymentLinkUrl}" target="_blank">Pay Down Payment</a></p>
+    `;
+    document.getElementById("summaryCard").classList.remove("hidden");
+
+    // Autopay pre-fill
     document.getElementById("customerId").value = result.customerId;
     document.getElementById("remainingInput").value = result.remaining;
     document.getElementById("termInput").value = data.termMonths;
+
+    toast("Plan created successfully");
   } catch (err) {
-    console.error("Error creating plan:", err);
-    alert(err.message);
+    hideLoading();
+    toast("Error creating plan", "error");
   }
 }
 
@@ -54,6 +88,8 @@ async function createPlan() {
 // CREATE MONTHLY AUTOPAY
 // ----------------------------
 async function createAutopay() {
+  showLoading();
+
   const data = {
     customerId: document.getElementById("customerId").value,
     remaining: Number(document.getElementById("remainingInput").value),
@@ -68,36 +104,35 @@ async function createAutopay() {
     });
 
     const result = await res.json();
+    hideLoading();
 
     if (!res.ok) {
-      throw new Error(result.error || "Failed to create subscription");
+      toast(result.error || "Failed to create autopay", "error");
+      return;
     }
 
     document.getElementById("autopayResult").innerText =
       "Subscription Created: " + result.subscriptionId;
+
+    toast("Autopay subscription created");
   } catch (err) {
-    console.error("Error creating autopay:", err);
-    alert(err.message);
+    hideLoading();
+    toast("Error creating autopay", "error");
   }
 }
 
-// Wire up forms
+// ----------------------------
+// FORM WIRING
+// ----------------------------
 document.addEventListener("DOMContentLoaded", () => {
-  const planForm = document.getElementById("planForm");
-  const autopayForm = document.getElementById("autopayForm");
+  document.getElementById("planForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    createPlan();
+  });
 
-  if (planForm) {
-    planForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      createPlan();
-    });
-  }
-
-  if (autopayForm) {
-    autopayForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      createAutopay();
-    });
-  }
+  document.getElementById("autopayForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    createAutopay();
+  });
 });
 
