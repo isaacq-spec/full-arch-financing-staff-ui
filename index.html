@@ -11,18 +11,24 @@
 
   <div class="container">
 
+    <!-- LOGO -->
+    <div class="logo-wrapper">
+      <img src="logo.png" class="logo" alt="Logo">
+    </div>
+
     <h1>Full-Arch Financing – Staff Portal</h1>
     <p class="subtitle">Create plans, generate payment links, and set up autopay.</p>
 
-    <!-- Toast and Loading -->
+    <!-- Toast & Loading -->
     <div id="toast" class="hidden toast"></div>
     <div id="loading" class="hidden loading">Processing…</div>
 
-    <!-- CREATE PLAN -->
+    <!-- STEP 1: CREATE PLAN -->
     <div class="card">
       <h2>Create Financing Plan</h2>
 
       <form id="planForm">
+
         <div class="field">
           <label>Patient Name</label>
           <input id="name" type="text" required />
@@ -69,8 +75,7 @@
       </div>
     </div>
 
-
-    <!-- AUTOPAY -->
+    <!-- STEP 2: AUTOPAY -->
     <div id="autopayCard" class="hidden card">
       <h2>Start Autopay</h2>
 
