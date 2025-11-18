@@ -1,6 +1,9 @@
-// Use your live backend URL on Render
-const API_BASE = "https://full-arch-financing.onrender.com/api";
+// Correct backend URL (NO /api at the end)
+const API_BASE = "https://full-arch-financing.onrender.com";
 
+// ----------------------------
+// CREATE PLAN + DOWN PAYMENT
+// ----------------------------
 async function createPlan() {
   const downPercentInput = Number(document.getElementById("downPercent").value);
 
@@ -9,8 +12,7 @@ async function createPlan() {
     email: document.getElementById("email").value,
     totalFee: Number(document.getElementById("totalFee").value),
     termMonths: Number(document.getElementById("termMonths").value),
-    // backend expects a decimal (0.2 for 20%), so convert here
-    downPercent: downPercentInput / 100,
+    downPercent: downPercentInput / 100, // convert from 20 → 0.20
   };
 
   try {
@@ -21,13 +23,13 @@ async function createPlan() {
     });
 
     const result = await res.json();
+
     if (!res.ok) {
+      console.error("Server returned error:", result);
       throw new Error(result.error || "Failed to create plan");
     }
 
-    console.log(result);
-
-    // Display results
+    // Fill calculated values
     document.getElementById("dp").innerText =
       result.downPaymentAmount.toFixed(2);
     document.getElementById("remaining").innerText =
@@ -35,22 +37,27 @@ async function createPlan() {
     document.getElementById("monthly").innerText =
       result.monthly.toFixed(2);
 
+    // Put payment link
     document.getElementById("paymentLink").href = result.paymentLinkUrl;
     document.getElementById("paymentLink").innerText = result.paymentLinkUrl;
 
+    // Reveal UI sections
     document.getElementById("results").classList.remove("hidden");
     document.getElementById("autopayCard").classList.remove("hidden");
 
-    // Fill autopay fields automatically
+    // Pre-fill autopay inputs
     document.getElementById("customerId").value = result.customerId;
     document.getElementById("remainingInput").value = result.remaining;
     document.getElementById("termInput").value = data.termMonths;
   } catch (err) {
-    console.error(err);
+    console.error("Error creating plan:", err);
     alert(err.message);
   }
 }
 
+// ----------------------------
+// CREATE MONTHLY AUTOPAY
+// ----------------------------
 async function createAutopay() {
   const data = {
     customerId: document.getElementById("customerId").value,
@@ -66,21 +73,23 @@ async function createAutopay() {
     });
 
     const result = await res.json();
+
     if (!res.ok) {
+      console.error("Server returned error:", result);
       throw new Error(result.error || "Failed to create subscription");
     }
-
-    console.log(result);
 
     document.getElementById("autopayResult").innerText =
       "Subscription Created: " + result.subscriptionId;
   } catch (err) {
-    console.error(err);
+    console.error("Error creating autopay:", err);
     alert(err.message);
   }
 }
 
-// Wire up forms to the functions
+// ----------------------------
+// WIRE UP THE FORMS
+// ----------------------------
 document.addEventListener("DOMContentLoaded", () => {
   const planForm = document.getElementById("planForm");
   const autopayForm = document.getElementById("autopayForm");
@@ -99,4 +108,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
