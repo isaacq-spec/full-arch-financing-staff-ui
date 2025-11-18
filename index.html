@@ -1,133 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Full-Arch Financing - Staff Portal</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      /* safety fallback in case style.css is empty */
-      body {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-        padding: 20px;
-        max-width: 800px;
-        margin: 0 auto;
-      }
-      .field {
-        margin-bottom: 10px;
-      }
-      label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 4px;
-      }
-      input {
-        width: 100%;
-        padding: 6px 8px;
-        box-sizing: border-box;
-      }
-      button {
-        padding: 8px 14px;
-        margin-top: 8px;
-        cursor: pointer;
-      }
-      .hidden {
-        display: none;
-      }
-      h1,
-      h2,
-      h3 {
-        margin-top: 20px;
-        margin-bottom: 10px;
-      }
-      hr {
-        margin: 24px 0;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Full-Arch Financing - Staff Portal</h1>
+<body>
+  <h1>Full-Arch Financing – Staff Portal</h1>
 
-    <!-- STEP 1: PLAN + DOWN PAYMENT -->
-    <section>
-      <h2>Step 1 – Create Plan & Down Payment Link</h2>
+  <!-- LOADING INDICATOR -->
+  <div id="loading" class="hidden loading">Processing…</div>
 
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="hidden toast"></div>
+
+  <!-- STEP 1: PLAN CREATION -->
+  <section class="card">
+    <h2>Step 1 – Create Plan & Down Payment Link</h2>
+
+    <form id="planForm">
       <div class="field">
-        <label for="name">Patient Name</label>
-        <input id="name" type="text" />
+        <label>Patient Name</label>
+        <input id="name" type="text" required />
       </div>
 
       <div class="field">
-        <label for="email">Patient Email</label>
-        <input id="email" type="email" />
+        <label>Patient Email</label>
+        <input id="email" type="email" required />
       </div>
 
       <div class="field">
-        <label for="totalFee">Total Fee ($)</label>
-        <input id="totalFee" type="number" min="0" step="0.01" />
+        <label>Total Fee ($)</label>
+        <input id="totalFee" type="number" min="0" step="0.01" required />
       </div>
 
       <div class="field">
-        <label for="termMonths">Term (months)</label>
-        <input id="termMonths" type="number" min="1" />
+        <label>Term (months)</label>
+        <input id="termMonths" type="number" min="1" required />
       </div>
 
       <div class="field">
-        <label for="downPercent">Down Payment (%)</label>
-        <input id="downPercent" type="number" min="0" max="100" />
+        <label>Down Payment (%)</label>
+        <input id="downPercent" type="number" min="0" max="100" required />
       </div>
 
-      <!-- IMPORTANT: this actually calls your JS -->
-      <button type="button" onclick="createPlan()">
-        Create Plan
-      </button>
+      <button type="submit">Create Plan</button>
+    </form>
 
-      <div id="results" class="hidden">
-        <h3>Plan Details</h3>
-        <p>Down Payment: $<span id="dp">0.00</span></p>
-        <p>Remaining Balance: $<span id="remaining">0.00</span></p>
-        <p>Monthly Payment: $<span id="monthly">0.00</span></p>
+    <div id="results" class="hidden">
+      <h3>Calculated Plan Details</h3>
+      <p>Down Payment: $<span id="dp">0.00</span></p>
+      <p>Remaining Balance: $<span id="remaining">0.00</span></p>
+      <p>Monthly Payment: $<span id="monthly">0.00</span></p>
 
-        <p>
-          Down Payment Link:
-          <a id="paymentLink" href="#" target="_blank"></a>
-        </p>
-      </div>
-    </section>
+      <p>
+        Down-Payment Link:
+        <a id="paymentLink" href="#" target="_blank"></a>
+      </p>
+    </div>
 
-    <hr />
+    <div id="summaryCard" class="hidden summary card">
+      <h3>Plan Summary</h3>
+      <div id="summaryContent"></div>
+    </div>
+  </section>
 
-    <!-- STEP 2: AUTOPAY -->
-    <section id="autopayCard" class="hidden">
-      <h2>Step 2 – Start Monthly Autopay</h2>
-      <p>Use this after the down payment is paid.</p>
+  <hr />
 
+  <!-- STEP 2: AUTOPAY -->
+  <section id="autopayCard" class="hidden card">
+    <h2>Step 2 – Start Monthly Autopay</h2>
+
+    <form id="autopayForm">
       <div class="field">
-        <label for="customerId">Stripe Customer ID</label>
+        <label>Stripe Customer ID</label>
         <input id="customerId" type="text" />
       </div>
 
       <div class="field">
-        <label for="remainingInput">Remaining Balance ($)</label>
+        <label>Remaining Balance ($)</label>
         <input id="remainingInput" type="number" min="0" step="0.01" />
       </div>
 
       <div class="field">
-        <label for="termInput">Term (months)</label>
+        <label>Term (months)</label>
         <input id="termInput" type="number" min="1" />
       </div>
 
-      <!-- IMPORTANT: this calls your JS -->
-      <button type="button" onclick="createAutopay()">
-        Create Monthly Autopay Subscription
-      </button>
+      <button type="submit">Create Monthly Autopay</button>
+    </form>
 
-      <div id="autopayResult"></div>
-    </section>
+    <div id="autopayResult"></div>
+  </section>
 
-    <!-- Load your JS last so all elements exist -->
-    <script src="script.js"></script>
-  </body>
-</html>
+  <script src="script.js"></script>
+</body>
 
