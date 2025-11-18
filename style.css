@@ -1,72 +1,78 @@
-body {
-    background: #f5f7fa;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 30px;
-}
-
-.container {
-    max-width: 700px;
-    margin: auto;
-}
-
-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.logo {
-    width: 120px;
-    margin-bottom: 10px;
-}
-
-h1 {
-    margin: 0;
-    font-size: 28px;
-}
-
+/* CARDS */
 .card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-    margin-bottom: 25px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
+
+/* FORM FIELDS */
+.field {
+  margin-bottom: 15px;
 }
 
 label {
-    font-weight: bold;
-    margin-top: 12px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: block;
 }
 
-input, select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
+/* BUTTONS */
 button {
-    background: #1d72ff;
-    color: white;
-    padding: 12px;
-    width: 100%;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 6px;
 }
 
 button:hover {
-    background: #125fcc;
+  background: #135cbc;
 }
 
+/* HIDDEN */
 .hidden {
-    display: none;
+  display: none;
 }
 
-#autopayResult {
-    margin-top: 12px;
-    font-weight: bold;
+/* LOADING */
+.loading {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #222;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  z-index: 999;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #333;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 6px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.25s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
 }
