@@ -1,91 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Full Arch Financing – Staff Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
 <body>
-  <h1>Full-Arch Financing – Staff Portal</h1>
 
-  <!-- LOADING INDICATOR -->
-  <div id="loading" class="hidden loading">Processing…</div>
+  <div class="container">
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="hidden toast"></div>
+    <h1>Full-Arch Financing – Staff Portal</h1>
+    <p class="subtitle">Create plans, generate payment links, and set up autopay.</p>
 
-  <!-- STEP 1: PLAN CREATION -->
-  <section class="card">
-    <h2>Step 1 – Create Plan & Down Payment Link</h2>
+    <!-- Toast and Loading -->
+    <div id="toast" class="hidden toast"></div>
+    <div id="loading" class="hidden loading">Processing…</div>
 
-    <form id="planForm">
-      <div class="field">
-        <label>Patient Name</label>
-        <input id="name" type="text" required />
+    <!-- CREATE PLAN -->
+    <div class="card">
+      <h2>Create Financing Plan</h2>
+
+      <form id="planForm">
+        <div class="field">
+          <label>Patient Name</label>
+          <input id="name" type="text" required />
+        </div>
+
+        <div class="field">
+          <label>Patient Email</label>
+          <input id="email" type="email" required />
+        </div>
+
+        <div class="field">
+          <label>Total Fee ($)</label>
+          <input id="totalFee" type="number" required />
+        </div>
+
+        <div class="field">
+          <label>Term (months)</label>
+          <input id="termMonths" type="number" required />
+        </div>
+
+        <div class="field">
+          <label>Down Payment (%)</label>
+          <input id="downPercent" type="number" required />
+        </div>
+
+        <button type="submit" class="primary">Create Plan</button>
+      </form>
+
+      <div id="results" class="hidden results">
+        <h3>Calculated Plan</h3>
+        <p><b>Down Payment:</b> $<span id="dp"></span></p>
+        <p><b>Remaining Balance:</b> $<span id="remaining"></span></p>
+        <p><b>Monthly Payment:</b> $<span id="monthly"></span></p>
+
+        <p>
+          <b>Down Payment Link:</b><br />
+          <a id="paymentLink" href="#" target="_blank"></a>
+        </p>
       </div>
 
-      <div class="field">
-        <label>Patient Email</label>
-        <input id="email" type="email" required />
+      <div id="summaryCard" class="hidden summary card">
+        <h3>Plan Summary</h3>
+        <div id="summaryContent"></div>
       </div>
-
-      <div class="field">
-        <label>Total Fee ($)</label>
-        <input id="totalFee" type="number" min="0" step="0.01" required />
-      </div>
-
-      <div class="field">
-        <label>Term (months)</label>
-        <input id="termMonths" type="number" min="1" required />
-      </div>
-
-      <div class="field">
-        <label>Down Payment (%)</label>
-        <input id="downPercent" type="number" min="0" max="100" required />
-      </div>
-
-      <button type="submit">Create Plan</button>
-    </form>
-
-    <div id="results" class="hidden">
-      <h3>Calculated Plan Details</h3>
-      <p>Down Payment: $<span id="dp">0.00</span></p>
-      <p>Remaining Balance: $<span id="remaining">0.00</span></p>
-      <p>Monthly Payment: $<span id="monthly">0.00</span></p>
-
-      <p>
-        Down-Payment Link:
-        <a id="paymentLink" href="#" target="_blank"></a>
-      </p>
     </div>
 
-    <div id="summaryCard" class="hidden summary card">
-      <h3>Plan Summary</h3>
-      <div id="summaryContent"></div>
+
+    <!-- AUTOPAY -->
+    <div id="autopayCard" class="hidden card">
+      <h2>Start Autopay</h2>
+
+      <form id="autopayForm">
+        <div class="field">
+          <label>Customer ID</label>
+          <input id="customerId" type="text" required />
+        </div>
+
+        <div class="field">
+          <label>Remaining ($)</label>
+          <input id="remainingInput" type="number" required />
+        </div>
+
+        <div class="field">
+          <label>Term (months)</label>
+          <input id="termInput" type="number" required />
+        </div>
+
+        <button type="submit" class="primary">Create Autopay</button>
+      </form>
+
+      <p id="autopayResult"></p>
     </div>
-  </section>
 
-  <hr />
-
-  <!-- STEP 2: AUTOPAY -->
-  <section id="autopayCard" class="hidden card">
-    <h2>Step 2 – Start Monthly Autopay</h2>
-
-    <form id="autopayForm">
-      <div class="field">
-        <label>Stripe Customer ID</label>
-        <input id="customerId" type="text" />
-      </div>
-
-      <div class="field">
-        <label>Remaining Balance ($)</label>
-        <input id="remainingInput" type="number" min="0" step="0.01" />
-      </div>
-
-      <div class="field">
-        <label>Term (months)</label>
-        <input id="termInput" type="number" min="1" />
-      </div>
-
-      <button type="submit">Create Monthly Autopay</button>
-    </form>
-
-    <div id="autopayResult"></div>
-  </section>
+  </div>
 
   <script src="script.js"></script>
 </body>
+</html>
 
