@@ -7,59 +7,123 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Full-Arch Financing - Staff Portal</h1>
+    <main class="container">
+      <h1>Full-Arch Financing - Staff Portal</h1>
 
-    <h2>Step 1 – Create Plan & Down Payment Link</h2>
-    <form id="planForm">
-      <label>
-        Patient Name
-        <input id="patientName" name="patientName" type="text" required />
-      </label>
-      <br />
-      <label>
-        Patient Email
-        <input id="patientEmail" name="patientEmail" type="email" required />
-      </label>
-      <br />
-      <label>
-        Total Fee ($)
-        <input id="totalFee" name="totalFee" type="number" min="0" step="0.01" required />
-      </label>
-      <br />
-      <label>
-        Term (months)
-        <input id="termMonths" name="termMonths" type="number" min="1" required />
-      </label>
-      <br />
-      <label>
-        Down Payment (%)
-        <input id="downPercent" name="downPercent" type="number" min="0" max="100" required />
-      </label>
-      <br />
-      <button type="submit">Create Plan</button>
-    </form>
+      <!-- STEP 1: PLAN + DOWN PAYMENT -->
+      <section>
+        <h2>Step 1 – Create Plan & Down Payment Link</h2>
 
-    <h2>Step 2 – Start Monthly Autopay</h2>
-    <p>Use this after the down payment is paid. It uses the same customer and remaining balance from Step 1.</p>
-    <form id="subscriptionForm">
-      <label>
-        Stripe Customer ID
-        <input id="customerId" name="customerId" type="text" required />
-      </label>
-      <br />
-      <label>
-        Monthly Amount ($)
-        <input id="monthlyAmount" name="monthlyAmount" type="number" min="0" step="0.01" required />
-      </label>
-      <br />
-      <label>
-        Start Date
-        <input id="startDate" name="startDate" type="date" required />
-      </label>
-      <br />
-      <button type="submit">Create Monthly Autopay Subscription</button>
-    </form>
+        <form id="planForm">
+          <div class="field">
+            <label for="name">Patient Name</label>
+            <input id="name" name="name" type="text" required />
+          </div>
 
+          <div class="field">
+            <label for="email">Patient Email</label>
+            <input id="email" name="email" type="email" required />
+          </div>
+
+          <div class="field">
+            <label for="totalFee">Total Fee ($)</label>
+            <input
+              id="totalFee"
+              name="totalFee"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="termMonths">Term (months)</label>
+            <input
+              id="termMonths"
+              name="termMonths"
+              type="number"
+              min="1"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="downPercent">Down Payment (%)</label>
+            <input
+              id="downPercent"
+              name="downPercent"
+              type="number"
+              min="0"
+              max="100"
+              required
+            />
+          </div>
+
+          <button type="submit" id="createPlanBtn">
+            Create Plan
+          </button>
+        </form>
+
+        <div id="results" class="hidden">
+          <h3>Plan Details</h3>
+          <p>Down Payment: $<span id="dp">0.00</span></p>
+          <p>Remaining Balance: $<span id="remaining">0.00</span></p>
+          <p>Monthly Payment: $<span id="monthly">0.00</span></p>
+
+          <p>
+            Down Payment Link:
+            <a id="paymentLink" href="#" target="_blank"></a>
+          </p>
+        </div>
+      </section>
+
+      <hr />
+
+      <!-- STEP 2: AUTOPAY -->
+      <section id="autopayCard" class="hidden">
+        <h2>Step 2 – Start Monthly Autopay</h2>
+        <p>Use this after the down payment is paid.</p>
+
+        <form id="autopayForm">
+          <div class="field">
+            <label for="customerId">Stripe Customer ID</label>
+            <input id="customerId" name="customerId" type="text" required />
+          </div>
+
+          <div class="field">
+            <label for="remainingInput">Remaining Balance ($)</label>
+            <input
+              id="remainingInput"
+              name="remainingInput"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="termInput">Term (months)</label>
+            <input
+              id="termInput"
+              name="termInput"
+              type="number"
+              min="1"
+              required
+            />
+          </div>
+
+          <button type="submit" id="createAutopayBtn">
+            Create Monthly Autopay Subscription
+          </button>
+        </form>
+
+        <div id="autopayResult"></div>
+      </section>
+    </main>
+
+    <!-- IMPORTANT: this must be at the bottom so elements exist first -->
     <script src="script.js"></script>
   </body>
 </html>
